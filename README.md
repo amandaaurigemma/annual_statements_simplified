@@ -142,8 +142,18 @@ retention and disposal rules to each copy.
    | To | `item()?['to']` |
    | Subject | `item()?['subject']` |
    | Body (HTML) | `item()?['body_html']` |
-   | Attachment Name | `item()?['attachment_name']` |
-   | Attachment Content | `base64ToBinary(item()?['attachment_base64'])` |
+
+   In **Advanced parameters**, show **Attachments** and select **Switch to
+   input entire array**. If you already configured individual attachment
+   fields, replace them with this whole-array mapping. Use the **Expression**
+   editor to enter the following expression.
+
+   ```text
+   createArray(addProperty(addProperty(json('{}'), 'Name', item()?['attachment_name']), 'ContentBytes', item()?['attachment_base64']))
+   ```
+
+   `ContentBytes` in the Outlook attachment array takes the PDF's base64
+   string directly. The connector gets the original bytes from that value.
 
    In the Outlook action settings, set **Retry policy** to **None**. Enable
    secure inputs and outputs where supported for actions handling package or
@@ -159,6 +169,10 @@ retention and disposal rules to each copy.
    acceptance can still be followed by a bounce.
 
 ### Approve, send, and reconcile a batch
+
+After setting up or changing the attachment mapping, run a fresh sample
+batch addressed to yourself. Open the received PDF and confirm that the file
+name includes the primary addressee before sending a donor batch.
 
 1. Generate and review the statements in the app, then select **Stage emails
    for review**. In **Email Queue**, select the batch, open **Send Now with

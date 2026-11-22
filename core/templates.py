@@ -5,7 +5,7 @@ import re
 from dataclasses import dataclass, field
 from html import escape as _html_escape
 from pathlib import Path
-from typing import Mapping
+from typing import Callable, Mapping
 
 from core.utils import (
     TemplateError,
@@ -82,11 +82,10 @@ def _resolve_placeholder(raw: str, fields: Mapping[str, str], unknown: list[str]
 
 
 def _substitute_placeholders(
-    text: str, fields: Mapping[str, str], unknown: list[str], html_context: bool
+    text: str, fields: Mapping[str, str], unknown: list[str], escape: Callable[[str], str]
 ) -> str:
     def _sub(m: re.Match) -> str:
-        raw_value = _resolve_placeholder(m.group(1), fields, unknown)
-        return _html_escape(raw_value) if html_context else _escape_pdf_text(raw_value)
+        return escape(_resolve_placeholder(m.group(1), fields, unknown))
 
     return _PLACEHOLDER_RE.sub(_sub, text)
 
@@ -124,11 +123,11 @@ def _find_matching(text: str) -> tuple[int | None, int, int]:
 
 
 def _process(
-    text: str, fields: Mapping[str, str], depth: int, unknown: list[str], html_context: bool
+    text: str, fields: Mapping[str, str], depth: int, unknown: list[str], escape: Callable[[str], str]
 ) -> str:
     m = _IF_OPEN_RE.search(text)
     if not m:
-        return _substitute_placeholders(text, fields, unknown, html_context)
+        return _substitute_placeholders(text, fields, unknown, escape)
 
     if depth >= MAX_CONDITIONAL_DEPTH:
         raise TemplateError(f"Conditional nesting exceeds max depth of {MAX_CONDITIONAL_DEPTH}")
@@ -148,18 +147,24 @@ def _process(
 
     chosen_body = if_body if _eval_condition(cond, fields) else else_body
 
-    resolved_before = _substitute_placeholders(before, fields, unknown, html_context)
-    resolved_chosen = _process(chosen_body, fields, depth + 1, unknown, html_context)
-    resolved_remainder = _process(remainder, fields, depth, unknown, html_context)
+    resolved_before = _substitute_placeholders(before, fields, unknown, escape)
+    resolved_chosen = _process(chosen_body, fields, depth + 1, unknown, escape)
+    resolved_remainder = _process(remainder, fields, depth, unknown, escape)
     return resolved_before + resolved_chosen + resolved_remainder
 
 
 def render(
-    text: str, fields: Mapping[str, str], *, strict: bool = False, html_context: bool = False
+    text: str,
+    fields: Mapping[str, str],
+    *,
+    strict: bool = False,
+    html_context: bool = False,
+    plain_text: bool = False,
 ) -> RenderResult:
     prepared = text.replace("\\{{", _LITERAL_BRACE_TOKEN)
     unknown: list[str] = []
-    output = _process(prepared, fields, 0, unknown, html_context)
+    escape = str if plain_text else _html_escape if html_context else _escape_pdf_text
+    output = _process(prepared, fields, 0, unknown, escape)
     output = output.replace(_LITERAL_BRACE_TOKEN, "{{")
     if strict and unknown:
         raise TemplateError(f"Unknown template field(s): {sorted(set(unknown))}")
