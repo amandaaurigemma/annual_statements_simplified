@@ -46,6 +46,7 @@ def _sanitize_attachment_name(text: str) -> str:
 
 def _build_field_map(donor: Donor, statement_year: int, timezone: str) -> dict[str, str]:
     fields = dict(donor.merge_fields)
+    fields["Salutation"] = donor.salutation.strip()
     fields["Statement Year"] = str(statement_year)
     fields["Total Amount"] = format_currency(donor.total_amount)
     fields["Total Receipt Amount"] = format_currency(donor.total_receipt)
