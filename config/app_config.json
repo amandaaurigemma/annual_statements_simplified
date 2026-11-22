@@ -1,0 +1,18 @@
+{
+  "app_name": "Annual Donor Statements",
+  "timezone": "America/Denver",
+  "data_dir": "data",
+  "preview": { "dpi": 110, "max_pages": 3 },
+  "email": {
+    "send_mode": "send",
+    "from_on_behalf": "",
+    "throttle_seconds": 2.0,
+    "max_attempts": 3,
+    "retry_backoff_seconds": 30
+  },
+  "history": { "backup_keep": 20 },
+  "retention": { "batch_artifact_days": 90 },
+  "generation": { "continue_on_record_error": true },
+  "ira": { "marker_substring": "IRA ", "case_sensitive": true },
+  "server": { "session_stale_minutes": 5 }
+}
