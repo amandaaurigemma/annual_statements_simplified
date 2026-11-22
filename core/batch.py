@@ -4,6 +4,7 @@ import csv
 import hashlib
 import json
 import os
+import re
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Callable
@@ -34,14 +35,18 @@ from core.utils import (
 ProgressCallback = Callable[[int, int, str], None]
 
 
-def _sanitize_filename(text: str) -> str:
-    for ch in '\\/:*?"<>|':
-        text = text.replace(ch, "-")
-    return " ".join(text.split())[:120]
+def _sanitize_attachment_name(text: str) -> str:
+    name = re.sub(r'[\x00-\x1f\x7f\\/:*?"<>|]', "-", " ".join(text.split()))
+    extension = name[-4:] if name.lower().endswith(".pdf") else ""
+    stem = name[:-4] if extension else name
+    max_stem_bytes = 120 - len(extension)
+    stem = stem.encode("utf-8")[:max_stem_bytes].decode("utf-8", errors="ignore")
+    return stem.rstrip(" .") + extension
 
 
 def _build_field_map(donor: Donor, statement_year: int, timezone: str) -> dict[str, str]:
     fields = dict(donor.merge_fields)
+    fields["Salutation"] = donor.salutation.strip()
     fields["Statement Year"] = str(statement_year)
     fields["Total Amount"] = format_currency(donor.total_amount)
     fields["Total Receipt Amount"] = format_currency(donor.total_receipt)
@@ -361,11 +366,14 @@ def export_mail(ctx: BatchContext, db: Database | None = None) -> dict[str, Path
 
 
 def build_email_attachment_name(ctx: BatchContext, donor: Donor) -> str:
-    fields = ctx.field_maps[donor.row_index]
+    fields = dict(ctx.field_maps[donor.row_index])
+    addressee = donor.addressee.strip() or "Donor"
+    fields["Addressee"] = addressee
+    fields["Primary Addressee"] = addressee
     pattern = ctx.template_manifest.raw.get("email", {}).get(
         "attachment_name_pattern", "{{Statement Year}} Giving Statement - {{Addressee}}.pdf"
     )
-    return _sanitize_filename(render(pattern, fields).output)
+    return _sanitize_attachment_name(render(pattern, fields, plain_text=True).output)
 
 
 def stage_emails(ctx: BatchContext) -> list[dict]:

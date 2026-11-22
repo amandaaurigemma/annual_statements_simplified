@@ -125,7 +125,14 @@ retention and disposal rules to each copy.
    }
    ```
 
-3. Inside the loop add SharePoint **Create item** against **Statement Send
+3. Inside the loop add a **Compose** action named **Decode PDF**. Enter this
+   in its **Expression** editor so the action outputs PDF bytes.
+
+   ```text
+   base64ToBinary(item()?['attachment_base64'])
+   ```
+
+   Next add SharePoint **Create item** against **Statement Send
    Ledger**. Set **Title** to the current job's `job_id`, **Batch ID** to
    the parsed `batch_id`, and **Send status** to `Needs review`. This is the
    send gate. Configure the Outlook action to run only when **Create item**
@@ -142,12 +149,22 @@ retention and disposal rules to each copy.
    | To | `item()?['to']` |
    | Subject | `item()?['subject']` |
    | Body (HTML) | `item()?['body_html']` |
-   | Attachment Name | `item()?['attachment_name']` |
-   | Attachment Content | `base64ToBinary(item()?['attachment_base64'])` |
+
+   In **Advanced parameters**, show **Attachments** and use the individual
+   attachment fields. If you previously used the entire-array input, remove
+   that expression and switch back to the individual fields. Add one attachment.
+
+   | Attachment field | Value |
+   | --- | --- |
+   | Name | `item()?['attachment_name']` |
+   | Content | **Outputs** from **Decode PDF** (dynamic content) |
+
+   Set **Content** to the **Outputs** token by itself. Passing
+   `attachment_base64` directly can send the encoded text as a `.pdf` file.
 
    In the Outlook action settings, set **Retry policy** to **None**. Enable
    secure inputs and outputs where supported for actions handling package or
-   message content. Limit access to flow run history.
+   message content, including **Decode PDF**. Limit access to flow run history.
 5. Add SharePoint **Update item** after the Outlook action with success-only
    **Run after**. Use the SharePoint item ID returned by **Create item**,
    preserve **Title** and **Batch ID**, and set **Send status** to
@@ -159,6 +176,10 @@ retention and disposal rules to each copy.
    acceptance can still be followed by a bounce.
 
 ### Approve, send, and reconcile a batch
+
+After setting up or changing the attachment mapping, run a fresh sample
+batch addressed to yourself. Open the received PDF and confirm that the file
+name includes the primary addressee before sending a donor batch.
 
 1. Generate and review the statements in the app, then select **Stage emails
    for review**. In **Email Queue**, select the batch, open **Send Now with
