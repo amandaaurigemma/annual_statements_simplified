@@ -11,11 +11,11 @@
   "gifts": {
     "pattern_fields": {
       "date": "Gift Date", "amount": "Gift Amount",
-      "receipt": "Receipt", "reference": "Reference"
+      "receipt": "Receipt Amount", "reference": "Reference"
     },
     "index_regex": "^Gifts\\s+(?P<idx>\\d+)\\s+(?P<base>.+)$",
     "max_groups": 400
   },
-  "required_headers": ["Constituent ID", "Primary Addressee", "Preferred Address Line 1", "Preferred City", "Preferred State", "Preferred ZIP"],
+  "required_headers": ["Constituent ID", "Primary Addressee", "Preferred Address Line 1", "Preferred City", "Preferred State", "Preferred ZIP", "Gifts 1 Gift Date", "Gifts 1 Gift Amount"],
   "required_headers_email_delivery": ["Email Address"]
 }
