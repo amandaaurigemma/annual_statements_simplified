@@ -199,7 +199,7 @@ def load_app_config(
             zip_header=name_address["zip"],
             email_header=schema_raw.get("email", {}).get("address", "Email Address"),
             gift_pattern_fields=dict(gifts["pattern_fields"]),
-            index_regex=gifts.get("index_regex", r"^(?P<base>.+?)\s+(?P<idx>\d+)$"),
+            index_regex=gifts.get("index_regex", r"^Gifts\s+(?P<idx>\d+)\s+(?P<base>.+)$"),
             max_groups=int(gifts.get("max_groups", 400)),
             required_headers=tuple(schema_raw.get("required_headers", [])),
             required_headers_email_delivery=tuple(

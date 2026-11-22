@@ -16,6 +16,8 @@ from core.utils import CsvError, DateParseError, DeliveryMethod, parse_date, par
 
 # CSV ingestion
 
+_LEGACY_GIFT_INDEX = re.compile(r"^(?P<base>.+?)\s+(?P<idx>\d+)$")
+
 
 @dataclass(frozen=True)
 class IngestResult:
@@ -43,18 +45,26 @@ def _detect_gift_groups(
     headers: list[str], schema: CsvSchema
 ) -> tuple[dict[int, dict[str, str]], list[int]]:
     index_re = re.compile(schema.index_regex)
+    fields_by_header = {header: field for field, header in schema.gift_pattern_fields.items()}
+    fields_by_header.setdefault("Receipt Amount", "receipt")
+    fields_by_header.setdefault("Gift Reference", "reference")
     groups: dict[int, dict[str, str]] = {}
     for header in headers:
-        m = index_re.match(header)
+        m = index_re.match(header) or _LEGACY_GIFT_INDEX.fullmatch(header)
         if not m:
             continue
         base, idx_str = m.group("base"), m.group("idx")
         idx = int(idx_str)
         if idx < 1 or idx > schema.max_groups:
             continue
-        for logical, base_name in schema.gift_pattern_fields.items():
-            if base == base_name:
-                groups.setdefault(idx, {})[logical] = header
+        logical = fields_by_header.get(base)
+        if logical:
+            groups.setdefault(idx, {})[logical] = header
+
+    if not groups:
+        unnumbered = {fields_by_header[h]: h for h in headers if h in fields_by_header}
+        if "amount" in unnumbered:
+            groups[1] = unnumbered
     incomplete = [
         idx for idx, fields in groups.items() if "amount" in fields and "date" not in fields
     ]
@@ -99,7 +109,7 @@ def ingest_csv(
         raise CsvError(f"Missing required column(s): {missing}")
 
     groups, incomplete_groups = _detect_gift_groups(raw_header, schema)
-    if not groups:
+    if not any("amount" in fields for fields in groups.values()):
         raise CsvError("No gift columns detected in the uploaded CSV")
 
     df = pd.read_csv(io.StringIO(text), dtype=str, keep_default_na=False)
