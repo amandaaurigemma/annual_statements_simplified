@@ -125,7 +125,14 @@ retention and disposal rules to each copy.
    }
    ```
 
-3. Inside the loop add SharePoint **Create item** against **Statement Send
+3. Inside the loop add a **Compose** action named **Decode PDF**. Enter this
+   in its **Expression** editor so the action outputs PDF bytes.
+
+   ```text
+   base64ToBinary(item()?['attachment_base64'])
+   ```
+
+   Next add SharePoint **Create item** against **Statement Send
    Ledger**. Set **Title** to the current job's `job_id`, **Batch ID** to
    the parsed `batch_id`, and **Send status** to `Needs review`. This is the
    send gate. Configure the Outlook action to run only when **Create item**
@@ -143,21 +150,21 @@ retention and disposal rules to each copy.
    | Subject | `item()?['subject']` |
    | Body (HTML) | `item()?['body_html']` |
 
-   In **Advanced parameters**, show **Attachments** and select **Switch to
-   input entire array**. If you already configured individual attachment
-   fields, replace them with this whole-array mapping. Use the **Expression**
-   editor to enter the following expression.
+   In **Advanced parameters**, show **Attachments** and use the individual
+   attachment fields. If you previously used the entire-array input, remove
+   that expression and switch back to the individual fields. Add one attachment.
 
-   ```text
-   createArray(addProperty(addProperty(json('{}'), 'Name', item()?['attachment_name']), 'ContentBytes', item()?['attachment_base64']))
-   ```
+   | Attachment field | Value |
+   | --- | --- |
+   | Name | `item()?['attachment_name']` |
+   | Content | **Outputs** from **Decode PDF** (dynamic content) |
 
-   `ContentBytes` in the Outlook attachment array takes the PDF's base64
-   string directly. The connector gets the original bytes from that value.
+   Set **Content** to the **Outputs** token by itself. Passing
+   `attachment_base64` directly can send the encoded text as a `.pdf` file.
 
    In the Outlook action settings, set **Retry policy** to **None**. Enable
    secure inputs and outputs where supported for actions handling package or
-   message content. Limit access to flow run history.
+   message content, including **Decode PDF**. Limit access to flow run history.
 5. Add SharePoint **Update item** after the Outlook action with success-only
    **Run after**. Use the SharePoint item ID returned by **Create item**,
    preserve **Title** and **Batch ID**, and set **Send status** to
