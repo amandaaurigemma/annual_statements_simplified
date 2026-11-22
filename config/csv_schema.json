@@ -16,6 +16,6 @@
     "index_regex": "^(?P<base>.+?)\\s+(?P<idx>\\d+)$",
     "max_groups": 400
   },
-  "required_headers": ["Constituent ID", "Addressee", "Address Line 1", "City", "State", "ZIP Code", "Gift Date 1", "Gift Amount 1"],
+  "required_headers": ["Constituent ID", "Addressee", "Address Line 1", "City", "State", "ZIP Code", "Gift Date", "Gift Amount"],
   "required_headers_email_delivery": ["Email Address"]
 }
