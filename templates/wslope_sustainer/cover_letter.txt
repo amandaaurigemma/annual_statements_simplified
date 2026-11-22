@@ -1,0 +1,9 @@
+Dear {{Salutation|default:Friend}},
+
+On behalf of everyone at the Food Bank of the Rockies, thank you for your steady, month-after-month generosity in {{Statement Year}}. Because of donors like you, our neighbors across the Western Slope communities have access to the food they need.
+
+Enclosed is your official giving statement for {{Statement Year}}, summarizing {{Gift Count}} gift(s) totaling {{Total Amount}}.
+
+[REVIEW: confirm final donor-facing cover letter copy for the Western Slope sustainer mailing.]
+
+With gratitude,

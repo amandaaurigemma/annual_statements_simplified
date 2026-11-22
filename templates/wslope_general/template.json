@@ -1,0 +1,113 @@
+{
+  "id": "wslope_general",
+  "display_name": "Western Slope \u2014 General",
+  "description": "Annual statement, Western Slope service area, one-time/general donors",
+  "version": 1,
+  "page": {
+    "size": "LETTER",
+    "margin_in": {
+      "top": 0.5,
+      "bottom": 0.5,
+      "left": 0.75,
+      "right": 0.75
+    }
+  },
+  "fonts": {
+    "family": "Carlito",
+    "base_size": 10.5,
+    "color": "#1a1a1a"
+  },
+  "spacing": {
+    "block_gap_pt": 10,
+    "paragraph_gap_pt": 6,
+    "table_gap_pt": 12
+  },
+  "header_image": {
+    "file": "assets/header.png",
+    "max_height_in": 1.1,
+    "align": "center"
+  },
+  "footer_image": {
+    "file": "assets/footer.png",
+    "max_height_in": 0.8,
+    "align": "center"
+  },
+  "text_align": {
+    "intro": "left",
+    "closing": "left"
+  },
+  "gift_table": {
+    "columns": {
+      "marker_pt": 10,
+      "date_frac": 0.22,
+      "amount_frac": 0.39,
+      "receipt_frac": 0.39
+    },
+    "header_labels": {
+      "date": "Date",
+      "amount": "Gift Amount",
+      "receipt": "Receipt Amount"
+    },
+    "font_size": 9.5,
+    "min_font_size": 8.0,
+    "font_step": 0.5,
+    "row_pad_pt": 3.0,
+    "min_row_pad_pt": 1.5,
+    "grid_color": "#c9c9c9",
+    "header_bg": "#f0efe9",
+    "zebra_bg": null,
+    "show_totals": true,
+    "totals_label": "Total",
+    "split_divider": {
+      "width_pt": 0.75,
+      "color": "#c9c9c9",
+      "gutter_pt": 14
+    },
+    "empty_text": "No gifts recorded for {{Statement Year}}."
+  },
+  "ira_footnote": "* Gift made via IRA Qualified Charitable Distribution.",
+  "envelope": {
+    "size_in": {
+      "w": 9.5,
+      "h": 4.125
+    },
+    "print_return_address": true,
+    "return_address_lines": [
+      "Food Bank of the Rockies",
+      "[REVIEW: street]",
+      "[REVIEW: city, state zip]"
+    ],
+    "return_pos_in": {
+      "x": 0.45,
+      "y": 0.4
+    },
+    "recipient_pos_in": {
+      "x": 3.9,
+      "y": 1.9
+    },
+    "font_size": 10.5
+  },
+  "window_envelope": {
+    "enabled": false,
+    "address_pos_in": {
+      "x": 0.9,
+      "y": 2.0
+    },
+    "address_width_in": 3.6
+  },
+  "email": {
+    "attachment_name_pattern": "{{Statement Year}} Giving Statement - {{Addressee}}.pdf",
+    "include_cover_as_body": true
+  },
+  "cover_letter": {
+    "enabled": true,
+    "date_line": true,
+    "signature_block": [
+      "[REVIEW: name]",
+      "[REVIEW: title]"
+    ]
+  },
+  "gifts": {
+    "sort_by_date": false
+  }
+}
