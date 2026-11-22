@@ -2,16 +2,16 @@
   "encoding_candidates": ["utf-8-sig", "cp1252"],
   "identity": { "constituent_id": "Constituent ID" },
   "name_address": {
-    "addressee": "Addressee",
-    "salutation": "Salutation",
-    "address_lines": ["Address Line 1", "Address Line 2"],
-    "city": "City", "state": "State", "zip": "ZIP Code"
+    "addressee": "Primary Addressee",
+    "salutation": "Primary Salutation",
+    "address_lines": ["Preferred Address Line 1", "Preferred Address Line 2"],
+    "city": "Preferred City", "state": "Preferred State", "zip": "Preferred ZIP"
   },
   "email": { "address": "Email Address" },
   "gifts": {
     "pattern_fields": {
       "date": "Gift Date", "amount": "Gift Amount",
-      "receipt": "Receipt Amount", "reference": "Gift Reference"
+      "receipt": "Receipt Amount", "reference": "Reference"
     },
     "index_regex": "^(?P<base>.+?)\\s+(?P<idx>\\d+)$",
     "max_groups": 400
